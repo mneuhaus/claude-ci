@@ -1,0 +1,29 @@
+{
+  "name": "claude-ci",
+  "version": "0.1.0",
+  "description": "A command-line tool for automating Claude CLI interactions",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "claude-ci": "./bin/claude-ci.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "claude",
+    "cli",
+    "automation",
+    "ai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "chalk": "^5.3.0",
+    "yaml": "^2.3.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
