@@ -181,8 +181,9 @@ class App {
         }
       }
 
+      let runner;
       try {
-        const runner = new ClaudeRunner({
+        runner = new ClaudeRunner({
           claudeOptions,
           directory: this.directory,
           logFile: this.logFile
@@ -194,7 +195,7 @@ class App {
       } catch (e) {
         lastError = e;
         // Try to extract session_id from the runner
-        lastSessionId = runner.resultMetadata?.session_id;
+        lastSessionId = runner?.resultMetadata?.session_id;
 
         if (attempt < maxAttempts && this.retryOnError) {
           console.error(`  Error occurred: ${e.message}`);
