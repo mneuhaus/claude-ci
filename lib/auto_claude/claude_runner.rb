@@ -24,15 +24,15 @@ module AutoClaude
       result = if @directory.blank?
         # Print log file location if provided
         if @log_file
-          ColorPrinter.print_message "Log file: #{@log_file}", color: :red
+          ColorPrinter.print_message "Log file: #{@log_file}", color: :dark_gray
         end
         run_internal(prompt)
       else
         raise "Directory does not exist: #{@directory}" unless File.directory?(@directory)
-        ColorPrinter.print_message "Working directory: #{@directory}", color: :red
+        ColorPrinter.print_message "Working directory: #{@directory}", color: :dark_gray
         # Print log file location if provided
         if @log_file
-          ColorPrinter.print_message "Log file: #{@log_file}", color: :red
+          ColorPrinter.print_message "Log file: #{@log_file}", color: :dark_gray
         end
         Dir.chdir(@directory) do
           run_internal(prompt)
@@ -80,8 +80,7 @@ module AutoClaude
             when "assistant", "user"
               MessageFormatter.format_messages(json).each do |msg|
                 next unless msg # Skip nil messages
-                color = msg.lstrip.start_with?("→") ? :blue : :cyan
-                ColorPrinter.print_message msg, color: color
+                ColorPrinter.print_message msg, color: :white
               end
             when "result"
               result += handle_result(json) || ""
@@ -169,7 +168,7 @@ module AutoClaude
     end
 
     def print_prompt(prompt, max_lines: 5)
-      ColorPrinter.print_message prompt, color: :white, max_lines: max_lines
+      ColorPrinter.print_message prompt, color: :blue, max_lines: max_lines
     end
 
     def write_metadata_json
