@@ -21,6 +21,20 @@ and some additional useful command-line options
 
 ## Installation
 
+### Using npx (no installation required)
+
+You can run claude-ci directly without installing it globally:
+
+```bash
+npx @mneuhaus/claude-ci "Your prompt here"
+```
+
+### Global installation
+
+```bash
+npm install -g @mneuhaus/claude-ci
+```
+
 ### From source
 
 ```bash
@@ -79,6 +93,9 @@ claude-ci "Your prompt" -- --model opus --temperature 0.7
 ```bash
 # Quick calculation
 claude-ci "What is 2+2?"
+
+# Using npx (no installation required)
+npx @mneuhaus/claude-ci "What is 2+2?"
 
 # Read from file
 claude-ci < input.txt

@@ -1,0 +1,32 @@
+# Files to exclude from npm package
+examples/
+.git/
+.gitignore
+*.gem
+*.rbc
+.bundle/
+Gemfile
+Gemfile.lock
+auto_claude.gemspec
+lib/auto_claude/
+lib/auto_claude.rb
+.ruby-version
+.ruby-gemset
+.rvmrc
+
+# Development files
+.DS_Store
+*.log
+.env
+.env.*
+.vscode/
+.idea/
+
+# Keep the essentials
+!package.json
+!package-lock.json
+!index.js
+!src/*.js
+!bin/claude-ci.js
+!README.md
+!LICENSE

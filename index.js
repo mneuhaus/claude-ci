@@ -1,5 +1,5 @@
-export { default as App } from './lib/app.js';
-export { default as ClaudeRunner } from './lib/claudeRunner.js';
-export { default as MessageFormatter } from './lib/messageFormatter.js';
-export { default as ColorPrinter } from './lib/colorPrinter.js';
-export { VERSION } from './lib/version.js';
+export { default as App } from './src/app.js';
+export { default as ClaudeRunner } from './src/claudeRunner.js';
+export { default as MessageFormatter } from './src/messageFormatter.js';
+export { default as ColorPrinter } from './src/colorPrinter.js';
+export { VERSION } from './src/version.js';

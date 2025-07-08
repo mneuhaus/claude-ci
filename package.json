@@ -1,5 +1,5 @@
 {
-  "name": "claude-ci",
+  "name": "@mneuhaus/claude-ci",
   "version": "0.1.0",
   "description": "A command-line tool for automating Claude CLI interactions",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "claude-ci": "./bin/claude-ci.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "echo 'Ready to publish!'"
   },
   "keywords": [
     "claude",
@@ -16,7 +17,15 @@
     "automation",
     "ai"
   ],
-  "author": "",
+  "author": "mneuhaus",
+  "homepage": "https://github.com/mneuhaus/claude-ci#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mneuhaus/claude-ci.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mneuhaus/claude-ci/issues"
+  },
   "license": "MIT",
   "dependencies": {
     "commander": "^12.0.0",
