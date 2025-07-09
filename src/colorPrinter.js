@@ -78,22 +78,14 @@ class ColorPrinter {
       loggedLines.push(`  ${firstLine}`);
     }
 
-    // Print remaining lines in regular color
+    // Print remaining lines in regular color (all of them)
     if (lines.length > 0) {
       const regularColorFn = this.colors[color]?.regular || this.colors.cyan.regular;
-      lines.slice(0, maxLines - 1).forEach(line => {
+      lines.forEach(line => {
         const outputLine = `  ${regularColorFn(line)}`;
         console.error(outputLine);
         loggedLines.push(`  ${line}`);
       });
-    }
-
-    // Show truncation notice if needed
-    if (totalLines > maxLines) {
-      const remaining = totalLines - maxLines;
-      const truncationMsg = `+ ${remaining} line${remaining === 1 ? '' : 's'} not shown`;
-      console.error(`    ${this.colors.lightGray.regular(truncationMsg)}`);
-      loggedLines.push(`    ${truncationMsg}`);
     }
 
     // Log all lines to file
