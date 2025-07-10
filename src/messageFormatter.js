@@ -6,7 +6,14 @@ import os from 'os';
 class MessageFormatter {
   static formatMessages(json) {
     const messages = json.message?.content || [];
-    return messages.map(msg => this.formatMessage(msg));
+    return messages.map(msg => {
+      const formatted = this.formatMessage(msg);
+      // Handle objects that contain formatting info
+      if (formatted && typeof formatted === 'object' && formatted.text) {
+        return formatted;
+      }
+      return formatted;
+    });
   }
 
   static formatMessage(message) {
@@ -15,27 +22,32 @@ class MessageFormatter {
         return `→ ${this.formatText(message.text)}`;
       
       case 'tool_use': {
-        const name = message.name;
+        const name = this.formatToolName(message.name);
         const input = this.filterInput(message.input || {});
+        const isMcpTool = message.name.includes('__');
 
-        switch (name) {
+        switch (message.name) {
           case 'Task':
-            return `→ ${name}${this.formatTaskInput(input)}\n`;
+            return { text: `→ ${name}${this.formatTaskInput(input)}`, type: 'tool_use' };
           case 'TodoWrite':
-            return `→ ${name}${this.formatTodoWriteInput(input)}\n`;
+            return { text: `→ ${name}${this.formatTodoWriteInput(input)}`, type: 'tool_use' };
           case 'Bash':
           case 'Read':
           case 'Edit':
-            return `→ ${name}(${this.formatArguments(input)})\n`;
+            return { text: `→ ${name}(${this.formatArguments(input)})`, type: 'tool_use' };
           default:
             this.logUnhandledMessage(message);
-            return `→ ${name} ${this.formatText(yaml.stringify(input))}`;
+            const formattedArgs = this.formatText(yaml.stringify(input));
+            if (isMcpTool) {
+              return { text: `→ ${name} ${formattedArgs}`, type: 'mcp_tool' };
+            }
+            return { text: `→ ${name} ${formattedArgs}`, type: 'tool_use' };
         }
       }
       
       case 'tool_result':
-        // Ignore these message types
-        return null;
+        // Format tool results
+        return this.formatToolResult(message);
       
       default: {
         const filtered = { ...message };
@@ -45,14 +57,104 @@ class MessageFormatter {
     }
   }
 
-  static formatText(text) {
+  static formatText(text, preserveIndent = false) {
     if (!text) return '';
+
+    if (preserveIndent) {
+      // For pre-formatted content like JSON, normalize and add consistent indentation
+      const lines = text.split('\n');
+      
+      // Find the minimum indentation (excluding empty lines)
+      let minIndent = Infinity;
+      lines.forEach((line, i) => {
+        if (line.trim()) {
+          const leadingSpaces = line.match(/^[\s]*/)[0].length;
+          minIndent = Math.min(minIndent, leadingSpaces);
+        }
+      });
+      
+      // Remove the minimum indentation from all lines and add our tab
+      const result = lines
+        .map((line, i) => {
+          if (line.trim()) {
+            // Remove common leading whitespace and add tab
+            const formatted = `\t${line.substring(minIndent)}`;
+            return formatted;
+          }
+          return line; // Keep empty lines as-is
+        })
+        .join('\n');
+        
+      return result;
+    }
 
     return text
       .split('\n')
       .map(line => `\t${line}`)
       .join('\n')
       .trimStart();
+  }
+
+  static formatToolName(name) {
+    // Convert tool names like mcp__gitlab__search_repositories to more readable format
+    if (name.includes('__')) {
+      // MCP tool format: mcp__provider__action
+      const parts = name.split('__');
+      if (parts.length >= 3 && parts[0] === 'mcp') {
+        // Convert snake_case to Title Case for the action part
+        const provider = parts[1];
+        const action = parts.slice(2).join('_')
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
+        return `[${provider}] ${action}`;
+      }
+    }
+    return name;
+  }
+
+  static formatToolResult(message) {
+    const toolUseId = message.tool_use_id;
+    const content = message.content;
+    
+    if (!content) {
+      return { text: `← Tool result (empty)\n`, type: 'tool_result' };
+    }
+
+    // Handle different content formats
+    let formattedContent;
+    let isError = false;
+    
+    if (Array.isArray(content)) {
+      // Content is an array of items
+      formattedContent = content
+        .map(item => {
+          if (item.type === 'text') {
+            const text = item.text;
+            // Check if the text looks like JSON
+            const isJson = text.trim().startsWith('{') || text.trim().startsWith('[');
+            return this.formatText(text, isJson);
+          }
+          return this.formatText(yaml.stringify(item));
+        })
+        .join('\n');
+    } else if (typeof content === 'string') {
+      // Check if it's an error message
+      isError = content.includes('MCP error') || content.includes('Error:') || content.includes('error');
+      
+      // Check if content contains JSON (might be mixed with text)
+      const lines = content.split('\n');
+      const hasJsonStart = lines.some(line => line.trim() === '{' || line.trim() === '[');
+      
+      // If it has JSON brackets on their own lines, it's likely formatted JSON
+      formattedContent = this.formatText(content, hasJsonStart);
+    } else {
+      // Content is an object or other type
+      formattedContent = this.formatText(yaml.stringify(content));
+    }
+
+    const type = isError ? 'tool_error' : 'tool_result';
+    return { text: `← Tool result:\n${formattedContent}\n`, type };
   }
 
   static formatTaskInput(input) {

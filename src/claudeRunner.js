@@ -96,7 +96,20 @@ class ClaudeRunner {
               const messages = MessageFormatter.formatMessages(json);
               for (const msg of messages) {
                 if (msg) {
-                  this.colorPrinter.printMessage(msg, { color: 'white' });
+                  // Check if message has type info for special formatting
+                  if (typeof msg === 'object' && msg.type === 'tool_error') {
+                    this.colorPrinter.printMessage(msg.text, { color: 'red' });
+                  } else if (typeof msg === 'object' && msg.type === 'tool_result') {
+                    this.colorPrinter.printMessage(msg.text, { color: 'cyan' });
+                  } else if (typeof msg === 'object' && msg.type === 'mcp_tool') {
+                    this.colorPrinter.printMessage(msg.text, { color: 'yellow' });
+                  } else if (typeof msg === 'object' && msg.type === 'tool_use') {
+                    this.colorPrinter.printMessage(msg.text, { color: 'yellow' });
+                  } else if (typeof msg === 'object' && msg.text) {
+                    this.colorPrinter.printMessage(msg.text, { color: 'white' });
+                  } else {
+                    this.colorPrinter.printMessage(msg, { color: 'white' });
+                  }
                 }
               }
               break;

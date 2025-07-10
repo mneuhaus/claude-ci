@@ -15,6 +15,18 @@ class ColorPrinter {
         regular: chalk.cyanBright,
         bold: chalk.bold.cyanBright
       },
+      yellow: {
+        regular: chalk.yellowBright,
+        bold: chalk.bold.yellowBright
+      },
+      magenta: {
+        regular: chalk.magentaBright,
+        bold: chalk.bold.magentaBright
+      },
+      gray: {
+        regular: chalk.gray,
+        bold: chalk.bold.gray
+      },
       lightGray: {
         regular: chalk.gray,
         bold: chalk.bold.gray
